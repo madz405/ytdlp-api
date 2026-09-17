@@ -1,2 +1,11 @@
+[project]
+name = "ytdlp-api"
+version = "0.1.0"
+description = "All-in-one downloader API berbasis yt-dlp"
+requires-python = ">=3.11"
+dependencies = [
+    "yt-dlp",
+]
+
 [tool.vercel]
 entrypoint = "api.download:handler"
