@@ -86,6 +86,35 @@ Kalau `url` yang dikirim adalah playlist, response akan berbentuk:
 }
 ```
 
+## Endpoint 2: Proxy/Stream media asli
+
+Karena link di `formats[].url` biasanya dilindungi CDN (butuh header
+`Referer`/`User-Agent` yang benar dan tidak bisa dibuka langsung di browser),
+gunakan endpoint ini supaya backend yang fetch filenya, bukan browser user:
+
+```
+GET /api/download?action=stream&url=<url_dari_formats_atau_direct_url>&filename=video.mp4
+```
+
+Response-nya **langsung file media** (bukan JSON) — otomatis kepicu download
+di browser karena ada header `Content-Disposition: attachment`.
+
+Parameter opsional:
+- `filename` — nama file saat di-download (default: `download.<ext>`)
+- `referer` — override Referer manual kalau deteksi otomatis meleset
+
+Alur pemakaian yang benar di frontend:
+
+```js
+// 1. Ambil metadata dulu
+const res = await fetch(`/api/download?url=${encodeURIComponent(videoUrl)}`);
+const data = await res.json();
+
+// 2. Untuk tombol "Download", arahkan ke endpoint stream, BUKAN data.direct_url langsung
+const downloadLink = `/api/download?action=stream&url=${encodeURIComponent(data.direct_url)}&filename=${encodeURIComponent(data.title)}.mp4`;
+// pasang downloadLink ini di <a href="..."> atau window.location
+```
+
 ## Testing lokal
 
 ```bash
@@ -94,6 +123,13 @@ vercel dev
 ```
 
 Lalu akses `http://localhost:3000/api/download?url=...`
+
+## Kenapa cuma 1 file di folder api/?
+
+Runtime Python terbaru di Vercel hanya mengizinkan **satu entrypoint** per
+project (dideklarasikan di `pyproject.toml`). Karena itu, endpoint metadata
+dan endpoint stream digabung dalam satu file (`api/download.py`) dan
+dibedakan lewat parameter `?action=stream`, bukan lewat file terpisah.
 
 ## Catatan penting
 
