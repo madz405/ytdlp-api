@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="public/assets/logo.jpg" width="128" alt="Mori Logo">
+</p>
+
 # All-in-One Downloader API (yt-dlp + Vercel)
 
 API sederhana yang membungkus [yt-dlp](https://github.com/yt-dlp/yt-dlp) dan mengembalikan
